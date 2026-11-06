@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: randevu-sistemi
+
+  # NOT: PostgreSQL baglanti ayarlari, infrastructure katmani (veritabani
+  # entity/repository siniflari) eklendigi gun bu dosyaya girilecektir.
+  # Simdilik sadece domain modeli derlendigi icin veritabani baglantisi
+  # gerekmemektedir.
+  #
+  # datasource:
+  #   url: jdbc:postgresql://localhost:5432/randevu_db
+  #   username: randevu_user
+  #   password: ${DB_PASSWORD}
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: validate
+  #   properties:
+  #     hibernate:
+  #       dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
