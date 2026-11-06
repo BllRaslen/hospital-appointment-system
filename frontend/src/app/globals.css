@@ -1,0 +1,26 @@
+:root {
+  --arka-plan: #f7f9fb;
+  --metin: #1a1a1a;
+  --vurgu: #0f6fb8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--arka-plan);
+  color: var(--metin);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+a {
+  color: var(--vurgu);
+}
