@@ -1,0 +1,102 @@
+# Hastane / Klinik Randevu Sistemi
+
+Nesneye Dayalı Programlama (NDP/OOP) dönem projesi — **Seçenek A: Hastane/Klinik Randevu Sistemi Geliştirme**.
+
+Platform bağımsız bir OOP konsepti olarak; hem tek bir klinik/hastane hem de
+çok şubeli sağlık kuruluşlarını destekleyebilen bir randevu sistemi
+geliştirilmektedir.
+
+## Teknoloji Yığını
+
+| Katman        | Teknoloji                                  |
+|---------------|---------------------------------------------|
+| Frontend      | Next.js (TypeScript)                         |
+| Backend       | Spring Boot (Java 17)                        |
+| Veritabanı    | PostgreSQL                                   |
+| Mimari        | Clean Architecture (Domain / Application / Infrastructure / Presentation) |
+| Kimlik Doğrulama | Spring Security + JWT                    |
+
+## Mimari Yaklaşım — Clean Architecture
+
+Proje, Robert C. Martin'in Clean Architecture prensiplerine göre katmanlara
+ayrılmıştır. **Bağımlılık Kuralı**: dış katmanlar iç katmanlara bağımlı
+olabilir, iç katmanlar (domain) hiçbir dış katmana veya framework'e bağımlı
+OLAMAZ.
+
+```
+backend/src/main/java/com/hastanesistemi/randevu/
+├── domain/           # Çekirdek iş kuralları — framework'ten bağımsız saf Java
+│   ├── model/        # Entity ve value object sınıfları (OOP'nin kalbi)
+│   └── exception/    # İş kuralı istisnaları
+├── application/      # Use-case'ler, port arayüzleri (henüz boş — yakında)
+├── infrastructure/   # JPA, PostgreSQL, Spring Security/JWT (henüz boş — yakında)
+└── presentation/     # REST controller'ları (henüz boş — yakında)
+```
+
+```
+frontend/src/
+├── app/              # Next.js App Router sayfaları (presentation)
+├── domain/           # API sözleşmesini temsil eden TypeScript tipleri
+├── application/      # (yakında) use-case hook'ları
+├── infrastructure/   # API istemcisi (apiClient.ts)
+└── presentation/      # (yakında) React bileşenleri
+```
+
+## Çok Şubeli Yapı İçin Veri Modeli
+
+Tüm şubeler **aynı** PostgreSQL veritabanında tutulur; her tablo
+`hospital_id` (facility id) yabancı anahtarı taşır. Birden fazla şubesi olan
+bir sağlık kuruluşu, `HealthcareOrganization` sınıfı altında birden fazla
+`HealthcareFacility` (Hospital/Clinic) barındırır. Tek şubeli bir klinik için
+`HealthcareOrganization` gerekmez.
+
+## Kullanıcı Rolleri
+
+1. **Hasta** — randevu oluşturur, görüntüler, iptal eder.
+2. **Doktor / Sağlık Personeli** — kendisine atanan randevuları onaylar/tamamlar, uygunluk saatlerini yönetir.
+3. **Hastane / Klinik Yöneticisi** — tesis, bölüm, çalışan ve hizmet tanımlarını yönetir.
+
+## OOP Prensiplerinin Uygulanışı
+
+Her OOP prensibinin hangi sınıfta ve neden kullanıldığının ayrıntılı açıklaması
+[`docs/OOP-PRENSIPLERI.md`](docs/OOP-PRENSIPLERI.md) dosyasındadır. Kod
+içindeki Türkçe Javadoc yorumları da aynı açıklamaları sınıf/metot seviyesinde
+tekrarlar.
+
+## Geliştirme Durumu (Günlük İlerleme)
+
+Bu proje, gerçek geliştirme sürecini yansıtan ayrı günlerde yapılan commit'lerle
+ilerletilmektedir (bkz. proje teslim gereksinimleri — en az 10 farklı günde commit).
+
+- [x] **Gün 1 (2026-11-06):** Proje iskeleti (monorepo, backend/frontend klasör yapısı), backend domain katmanı (Person/Employee/Doctor/Staff/FacilityManager, HealthcareFacility/Hospital/Clinic, Appointment, MedicalService, value object'ler, istisnalar) ve birim testleri.
+- [ ] Application katmanı (use-case servisleri, repository port arayüzleri)
+- [ ] Infrastructure katmanı (JPA entity eşlemeleri, PostgreSQL bağlantısı, Spring Security + JWT)
+- [ ] Presentation katmanı (REST controller'lar)
+- [ ] Frontend: giriş/kayıt ekranları, randevu oluşturma akışı
+- [ ] Frontend: doktor/yönetici panelleri
+- [ ] Entegrasyon testleri ve son rötuşlar
+
+## Çalıştırma (Backend)
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+> Not: PostgreSQL bağlantı ayarları infrastructure katmanı eklendiğinde
+> `application.yml` içine girilecektir. Şu an için sadece domain katmanı
+> testleri çalıştırılabilir:
+> ```bash
+> cd backend
+> mvn test
+> ```
+
+## Çalıştırma (Frontend)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Tarayıcıda `http://localhost:3000` adresini açın.
