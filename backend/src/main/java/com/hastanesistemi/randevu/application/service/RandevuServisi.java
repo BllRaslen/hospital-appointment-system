@@ -4,6 +4,7 @@ import com.hastanesistemi.randevu.application.port.out.AppointmentRepository;
 import com.hastanesistemi.randevu.application.pricing.StandartUcretlendirmeStrategy;
 import com.hastanesistemi.randevu.application.pricing.UcretlendirmeStrategy;
 import com.hastanesistemi.randevu.domain.exception.AppointmentConflictException;
+import com.hastanesistemi.randevu.domain.exception.InvalidAppointmentStateException;
 import com.hastanesistemi.randevu.domain.exception.InvalidAvailabilityException;
 import com.hastanesistemi.randevu.domain.model.appointment.Appointment;
 import com.hastanesistemi.randevu.domain.model.common.TimeSlot;
@@ -75,5 +76,23 @@ public class RandevuServisi {
         }
 
         return randevuDeposu.kaydet(aday);
+    }
+
+    /** Randevuyu onaylar ve ilgili hasta/doktora bildirim gonderir. */
+    public Appointment randevuOnayla(Long randevuId) {
+        Appointment randevu = randevuBul(randevuId);
+        randevu.onayla();
+        bildirimGonder(randevu, "Randevunuz onaylandi: " + randevu.getZamanAraligi());
+        return randevuDeposu.kaydet(randevu);
+    }
+
+    private Appointment randevuBul(Long randevuId) {
+        return randevuDeposu.idIleBul(randevuId)
+                .orElseThrow(() -> new InvalidAppointmentStateException("Randevu bulunamadi: id=" + randevuId));
+    }
+
+    private void bildirimGonder(Appointment randevu, String mesaj) {
+        randevu.getHasta().bildirimGonder(mesaj);
+        randevu.getDoktor().bildirimGonder(mesaj);
     }
 }
