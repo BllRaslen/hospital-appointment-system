@@ -55,7 +55,13 @@ class SahteRandevuDeposu implements AppointmentRepository {
 
     @Override
     public List<Appointment> hastaninRandevulariniGetir(Patient hasta) {
-        throw new UnsupportedOperationException("Henuz uygulanmadi.");
+        List<Appointment> sonuc = new ArrayList<>();
+        for (Appointment randevu : depo.values()) {
+            if (randevu.getHasta().equals(hasta)) {
+                sonuc.add(randevu);
+            }
+        }
+        return sonuc;
     }
 
     @Override
