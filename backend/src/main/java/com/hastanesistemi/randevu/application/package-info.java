@@ -9,6 +9,16 @@
  * arayuzu burada tanimlanir, gercek veritabani implementasyonu ise
  * infrastructure katmaninda yazilir).
  * <p>
+ * Alt paketler:
+ * <ul>
+ *   <li>{@code port.out} - repository PORT arayuzleri (Repository deseni)</li>
+ *   <li>{@code factory} - nesne olusturma mantigini merkezilestiren fabrikalar
+ *       (Factory Method deseni, bkz. {@code EmployeeFactory})</li>
+ *   <li>{@code pricing} - degistirilebilir ucretlendirme algoritmalari
+ *       (Strategy deseni, bkz. {@code UcretlendirmeStrategy})</li>
+ *   <li>{@code service} - use-case servisleri (bkz. {@code RandevuServisi})</li>
+ * </ul>
+ * <p>
  * Durum: Bu katmanin ic icerigi, domain modeli tamamlandiktan sonraki
  * gunlerde (use case servisleri, DTO'lar, port arayuzleri) eklenecektir.
  */
