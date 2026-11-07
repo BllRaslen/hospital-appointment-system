@@ -66,6 +66,6 @@ class SahteRandevuDeposu implements AppointmentRepository {
 
     @Override
     public List<Appointment> hepsiniGetir() {
-        throw new UnsupportedOperationException("Henuz uygulanmadi.");
+        return new ArrayList<>(depo.values());
     }
 }
