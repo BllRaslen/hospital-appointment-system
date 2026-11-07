@@ -19,7 +19,8 @@
  *   <li>{@code service} - use-case servisleri (bkz. {@code RandevuServisi})</li>
  * </ul>
  * <p>
- * Durum: Bu katmanin ic icerigi, domain modeli tamamlandiktan sonraki
- * gunlerde (use case servisleri, DTO'lar, port arayuzleri) eklenecektir.
+ * Durum: infrastructure (JPA/PostgreSQL implementasyonlari) ve presentation
+ * (REST controller) katmanlari eklendiginde, buradaki port arayuzleri ilgili
+ * somut siniflar tarafindan implemente edilecek/cagrilacaktir.
  */
 package com.hastanesistemi.randevu.application;
