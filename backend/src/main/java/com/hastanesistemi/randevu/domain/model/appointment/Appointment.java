@@ -96,6 +96,27 @@ public class Appointment {
         this.doktor.tamamlananRandevuSayaciniArttir();
     }
 
+    /**
+     * Depolama (repository) katmani tarafindan, nesne ilk kez kaydedilirken
+     * kimlik atamasi yapabilmesi icin kullanilir. Gereksinim: domain nesnesi
+     * veritabanindan/infrastructure'dan bagimsiz kalsa da, henuz bir
+     * infrastructure (JPA) katmani olmadan application katmanindaki
+     * repository implementasyonlarinin (ornegin bellek ici sahte repository)
+     * kimlik uretebilmesi gerekir.
+     * <p>
+     * OOP ilkesi: KAPSULLEME - bu, sinirsiz bir setId() DEGILDIR: id sadece
+     * hala bos (null) oldugunda bir kez atanabilir; zaten kimligi olan bir
+     * randevunun kimligi SONRADAN DEGISTIRILEMEZ. Boylece nesnenin kimlik
+     * butunlugu (identity integrity) korunur.
+     */
+    public void idAta(Long id) {
+        if (this.id != null) {
+            throw new InvalidAppointmentStateException(
+                    "Bu randevunun zaten bir kimligi (id) var, tekrar atanamaz: " + this.id);
+        }
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }
