@@ -3,6 +3,14 @@ package com.hastanesistemi.randevu.application.service;
 import com.hastanesistemi.randevu.application.port.out.AppointmentRepository;
 import com.hastanesistemi.randevu.application.pricing.StandartUcretlendirmeStrategy;
 import com.hastanesistemi.randevu.application.pricing.UcretlendirmeStrategy;
+import com.hastanesistemi.randevu.domain.exception.AppointmentConflictException;
+import com.hastanesistemi.randevu.domain.exception.InvalidAvailabilityException;
+import com.hastanesistemi.randevu.domain.model.appointment.Appointment;
+import com.hastanesistemi.randevu.domain.model.common.TimeSlot;
+import com.hastanesistemi.randevu.domain.model.facility.HealthcareFacility;
+import com.hastanesistemi.randevu.domain.model.person.Doctor;
+import com.hastanesistemi.randevu.domain.model.person.Patient;
+import com.hastanesistemi.randevu.domain.model.service.MedicalService;
 
 /**
  * Randevu olusturma/onaylama/iptal/tamamlama is senaryolarini (use case)
@@ -44,5 +52,28 @@ public class RandevuServisi {
         }
         this.randevuDeposu = randevuDeposu;
         this.ucretlendirmeStrategy = ucretlendirmeStrategy;
+    }
+
+    /**
+     * Yeni bir randevu olusturur. Sirasiyla: (1) doktorun tanimli uygunluk
+     * saatlerinden biriyle eslesip eslesmedigini, (2) doktorun ayni zaman
+     * araliginda baska bir aktif randevusu olup olmadigini kontrol eder.
+     */
+    public Appointment randevuOlustur(Patient hasta, Doctor doktor, MedicalService hizmet,
+                                       HealthcareFacility tesis, TimeSlot zamanAraligi) {
+        if (!doktor.zamanUygunMu(zamanAraligi)) {
+            throw new InvalidAvailabilityException(
+                    "Talep edilen zaman araligi, doktorun tanimli uygunluk saatleriyle eslesmiyor: " + zamanAraligi);
+        }
+
+        Appointment aday = new Appointment(null, hasta, doktor, hizmet, tesis, zamanAraligi);
+        boolean cakismaVar = randevuDeposu.doktorunRandevulariniGetir(doktor).stream()
+                .anyMatch(mevcutRandevu -> mevcutRandevu.cakisiyorMu(aday));
+        if (cakismaVar) {
+            throw new AppointmentConflictException(
+                    "Doktorun bu zaman araliginda baska bir randevusu var: " + zamanAraligi);
+        }
+
+        return randevuDeposu.kaydet(aday);
     }
 }
