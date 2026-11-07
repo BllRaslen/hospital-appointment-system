@@ -2,6 +2,7 @@ package com.hastanesistemi.randevu.application;
 
 import com.hastanesistemi.randevu.application.service.RandevuServisi;
 import com.hastanesistemi.randevu.domain.exception.AppointmentConflictException;
+import com.hastanesistemi.randevu.domain.exception.InvalidAppointmentStateException;
 import com.hastanesistemi.randevu.domain.exception.InvalidAvailabilityException;
 import com.hastanesistemi.randevu.domain.model.appointment.Appointment;
 import com.hastanesistemi.randevu.domain.model.appointment.AppointmentStatus;
@@ -114,5 +115,11 @@ class RandevuServisiTest {
         Appointment tamamlanan = servis.randevuTamamla(olusturulan.getId());
         assertEquals(AppointmentStatus.TAMAMLANDI, tamamlanan.getDurum());
         assertEquals(1, doktor.getTamamlananRandevuSayisi());
+    }
+
+    @Test
+    void randevuBulunamayinca_InvalidAppointmentStateExceptionFirlar() {
+        RandevuServisi servis = new RandevuServisi(new SahteRandevuDeposu());
+        assertThrows(InvalidAppointmentStateException.class, () -> servis.randevuOnayla(999L));
     }
 }
