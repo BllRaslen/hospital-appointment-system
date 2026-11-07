@@ -86,6 +86,14 @@ public class RandevuServisi {
         return randevuDeposu.kaydet(randevu);
     }
 
+    /** Randevuyu iptal eder ve ilgili hasta/doktora bildirim gonderir. */
+    public Appointment randevuIptalEt(Long randevuId) {
+        Appointment randevu = randevuBul(randevuId);
+        randevu.iptalEt();
+        bildirimGonder(randevu, "Randevunuz iptal edildi: " + randevu.getZamanAraligi());
+        return randevuDeposu.kaydet(randevu);
+    }
+
     private Appointment randevuBul(Long randevuId) {
         return randevuDeposu.idIleBul(randevuId)
                 .orElseThrow(() -> new InvalidAppointmentStateException("Randevu bulunamadi: id=" + randevuId));
