@@ -94,6 +94,13 @@ public class RandevuServisi {
         return randevuDeposu.kaydet(randevu);
     }
 
+    /** Randevuyu tamamlanmis olarak isaretler (doktorun ek odeme sayacini da gunceller). */
+    public Appointment randevuTamamla(Long randevuId) {
+        Appointment randevu = randevuBul(randevuId);
+        randevu.tamamla();
+        return randevuDeposu.kaydet(randevu);
+    }
+
     private Appointment randevuBul(Long randevuId) {
         return randevuDeposu.idIleBul(randevuId)
                 .orElseThrow(() -> new InvalidAppointmentStateException("Randevu bulunamadi: id=" + randevuId));
