@@ -98,4 +98,21 @@ class RandevuServisiTest {
         assertThrows(AppointmentConflictException.class,
                 () -> servis.randevuOlustur(hasta2, doktor, hizmetOlustur(), tesisOlustur(), zaman2));
     }
+
+    @Test
+    void randevuOnaylaIptalTamamlaAkisi_depodakiRandevuyuGuncelGetirir() {
+        TimeSlot zaman = new TimeSlot(LocalDateTime.of(2026, 11, 9, 10, 0), LocalDateTime.of(2026, 11, 9, 10, 30));
+        Doctor doktor = doktorOlustur(zaman.getBaslangic().getDayOfWeek());
+        Patient hasta = hastaOlustur(null);
+
+        RandevuServisi servis = new RandevuServisi(new SahteRandevuDeposu());
+        Appointment olusturulan = servis.randevuOlustur(hasta, doktor, hizmetOlustur(), tesisOlustur(), zaman);
+
+        Appointment onaylanan = servis.randevuOnayla(olusturulan.getId());
+        assertEquals(AppointmentStatus.ONAYLANDI, onaylanan.getDurum());
+
+        Appointment tamamlanan = servis.randevuTamamla(olusturulan.getId());
+        assertEquals(AppointmentStatus.TAMAMLANDI, tamamlanan.getDurum());
+        assertEquals(1, doktor.getTamamlananRandevuSayisi());
+    }
 }
