@@ -114,6 +114,7 @@ klasik tasarım deseni kullanılmıştır — hepsi `backend/src/main/java/com/h
 |---|---|---|
 | **Repository** | `port.out.{Patient,Doctor,MedicalService,HealthcareFacility,Appointment}Repository` | Application katmanı, verinin PostgreSQL'de mi yoksa bellekte mi saklandığını bilmez; sadece bu arayüzleri bilir. Bağımlılık Kuralı'nın (Dependency Rule) somut uygulaması — bkz. `RandevuServisiTest` + `SahteRandevuDeposu`, gerçek bir veritabanı olmadan test edilebildiğini kanıtlar. |
 | **Factory Method** | `factory.EmployeeFactory` | `Role` enumuna göre `Doctor`/`Staff`/`FacilityManager`'dan hangisinin örnekleneceği kararı, çağıran koddan (ileride bir personel kayıt servisi/controller) ayrıştırılır. |
+| **Strategy** | `pricing.UcretlendirmeStrategy` + `StandartUcretlendirmeStrategy` + `SigortaliUcretlendirmeStrategy` | `Employee.aylikEkOdemeHesapla()` kalıtım ile polimorfizm sağlıyordu (her ALT SINIF sabit bir kurala bağlı); burada ise aynı hesaplama türünün (ücretlendirme) birden fazla algoritması, kalıtım kullanmadan, **çalışma zamanında enjekte edilerek** (kompozisyon) değiştirilebilir. "Kalıtım yerine kompozisyonu tercih et" ilkesinin klasik örneği. |
 
 ## Devam Edecek Çalışma
 
