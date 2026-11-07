@@ -1,5 +1,6 @@
 package com.hastanesistemi.randevu.application;
 
+import com.hastanesistemi.randevu.application.pricing.SigortaliUcretlendirmeStrategy;
 import com.hastanesistemi.randevu.application.service.RandevuServisi;
 import com.hastanesistemi.randevu.domain.exception.AppointmentConflictException;
 import com.hastanesistemi.randevu.domain.exception.InvalidAppointmentStateException;
@@ -121,5 +122,24 @@ class RandevuServisiTest {
     void randevuBulunamayinca_InvalidAppointmentStateExceptionFirlar() {
         RandevuServisi servis = new RandevuServisi(new SahteRandevuDeposu());
         assertThrows(InvalidAppointmentStateException.class, () -> servis.randevuOnayla(999L));
+    }
+
+    @Test
+    void strategyDeseni_sigortaliHastayaIndirimliUcretUygulanir() {
+        TimeSlot zaman = new TimeSlot(LocalDateTime.of(2026, 11, 9, 10, 0), LocalDateTime.of(2026, 11, 9, 10, 30));
+        Doctor doktor = doktorOlustur(zaman.getBaslangic().getDayOfWeek());
+        Patient sigortaliHasta = hastaOlustur("SGK-999");
+        Patient sigortasizHasta = hastaOlustur(null);
+
+        RandevuServisi standartServis = new RandevuServisi(new SahteRandevuDeposu());
+        RandevuServisi sigortaliServis = new RandevuServisi(new SahteRandevuDeposu(), new SigortaliUcretlendirmeStrategy());
+
+        Appointment sigortaliRandevu = sigortaliServis.randevuOlustur(sigortaliHasta, doktor, hizmetOlustur(), tesisOlustur(), zaman);
+        Appointment sigortasizRandevu = standartServis.randevuOlustur(sigortasizHasta, doktor, hizmetOlustur(), tesisOlustur(), zaman);
+
+        // Ayni strateji (standart), sigorta durumuna bakmaksizin tam ucret doner.
+        assertEquals(BigDecimal.valueOf(500).setScale(2), standartServis.efektifUcretHesapla(sigortasizRandevu).setScale(2));
+        // Sigortali strateji, sigortasi OLAN hastaya %20 indirim uygular.
+        assertEquals(BigDecimal.valueOf(400).setScale(2), sigortaliServis.efektifUcretHesapla(sigortaliRandevu).setScale(2));
     }
 }
