@@ -116,8 +116,14 @@ klasik tasarım deseni kullanılmıştır — hepsi `backend/src/main/java/com/h
 | **Factory Method** | `factory.EmployeeFactory` | `Role` enumuna göre `Doctor`/`Staff`/`FacilityManager`'dan hangisinin örnekleneceği kararı, çağıran koddan (ileride bir personel kayıt servisi/controller) ayrıştırılır. |
 | **Strategy** | `pricing.UcretlendirmeStrategy` + `StandartUcretlendirmeStrategy` + `SigortaliUcretlendirmeStrategy` | `Employee.aylikEkOdemeHesapla()` kalıtım ile polimorfizm sağlıyordu (her ALT SINIF sabit bir kurala bağlı); burada ise aynı hesaplama türünün (ücretlendirme) birden fazla algoritması, kalıtım kullanmadan, **çalışma zamanında enjekte edilerek** (kompozisyon) değiştirilebilir. "Kalıtım yerine kompozisyonu tercih et" ilkesinin klasik örneği. |
 
+`application.service.RandevuServisi`, bu üç deseni ve domain katmanının
+kapsülleme/çok biçimlilik ilkelerini (durum geçişleri, `Notifiable` arayüzü)
+bir araya getiren use-case servisidir: `randevuOlustur` → doktor uygunluğu
+(`Doctor.zamanUygunMu`) ve çakışma (`Appointment.cakisiyorMu`) kontrolü;
+`randevuOnayla`/`randevuIptalEt`/`randevuTamamla` → domain'in kendi durum
+makinesi; `efektifUcretHesapla` → enjekte edilen `UcretlendirmeStrategy`.
+
 ## Devam Edecek Çalışma
 
-Bu doküman, domain katmanı tamamlandıkça (application/infrastructure/
-presentation katmanları eklendiğinde — örn. Strategy, Factory, Repository
-desenleri) güncellenecektir.
+Bu doküman, infrastructure (JPA/PostgreSQL) ve presentation (REST
+controller) katmanları eklendiğinde güncellenecektir.
