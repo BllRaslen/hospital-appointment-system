@@ -1,6 +1,7 @@
 package com.hastanesistemi.randevu.application;
 
 import com.hastanesistemi.randevu.application.service.RandevuServisi;
+import com.hastanesistemi.randevu.domain.exception.InvalidAvailabilityException;
 import com.hastanesistemi.randevu.domain.model.appointment.Appointment;
 import com.hastanesistemi.randevu.domain.model.appointment.AppointmentStatus;
 import com.hastanesistemi.randevu.domain.model.common.Address;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -65,5 +67,18 @@ class RandevuServisiTest {
 
         assertEquals(AppointmentStatus.BEKLEMEDE, randevu.getDurum());
         assertTrue(randevu.getId() > 0, "Repository, kaydedilen randevuya bir id atamis olmalidir.");
+    }
+
+    @Test
+    void randevuOlusturma_doktorUygunlugununDisindaZamanIcinReddedilir() {
+        TimeSlot zaman = new TimeSlot(LocalDateTime.of(2026, 11, 9, 20, 0), LocalDateTime.of(2026, 11, 9, 20, 30));
+        // Doktor sadece zamanin gununde 09:00-17:00 arasi uygun; 20:00 bu araligin DISINDA.
+        Doctor doktor = doktorOlustur(zaman.getBaslangic().getDayOfWeek());
+        Patient hasta = hastaOlustur(null);
+
+        RandevuServisi servis = new RandevuServisi(new SahteRandevuDeposu());
+
+        assertThrows(InvalidAvailabilityException.class,
+                () -> servis.randevuOlustur(hasta, doktor, hizmetOlustur(), tesisOlustur(), zaman));
     }
 }
