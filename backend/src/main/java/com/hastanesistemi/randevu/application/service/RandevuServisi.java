@@ -13,6 +13,8 @@ import com.hastanesistemi.randevu.domain.model.person.Doctor;
 import com.hastanesistemi.randevu.domain.model.person.Patient;
 import com.hastanesistemi.randevu.domain.model.service.MedicalService;
 
+import java.math.BigDecimal;
+
 /**
  * Randevu olusturma/onaylama/iptal/tamamlama is senaryolarini (use case)
  * yuruten uygulama servisi. Gereksinim: "Randevu olusturulurken cakisma
@@ -99,6 +101,11 @@ public class RandevuServisi {
         Appointment randevu = randevuBul(randevuId);
         randevu.tamamla();
         return randevuDeposu.kaydet(randevu);
+    }
+
+    /** Enjekte edilen stratejiye gore randevunun efektif (indirimli olabilir) ucretini hesaplar. */
+    public BigDecimal efektifUcretHesapla(Appointment randevu) {
+        return ucretlendirmeStrategy.hesapla(randevu.getHizmet(), randevu.getHasta());
     }
 
     private Appointment randevuBul(Long randevuId) {
