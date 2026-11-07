@@ -69,7 +69,7 @@ Bu proje, gerçek geliştirme sürecini yansıtan ayrı günlerde yapılan commi
 ilerletilmektedir (bkz. proje teslim gereksinimleri — en az 10 farklı günde commit).
 
 - [x] **Gün 1 (2026-11-06):** Proje iskeleti (monorepo, backend/frontend klasör yapısı), backend domain katmanı (Person/Employee/Doctor/Staff/FacilityManager, HealthcareFacility/Hospital/Clinic, Appointment, MedicalService, value object'ler, istisnalar) ve birim testleri.
-- [ ] Application katmanı (use-case servisleri, repository port arayüzleri)
+- [x] **Gün 2 (2026-11-07):** Application katmanı — repository port arayüzleri (Repository deseni), `EmployeeFactory` (Factory Method deseni), `UcretlendirmeStrategy` ve implementasyonları (Strategy deseni), `RandevuServisi` (randevu oluşturma/onaylama/iptal/tamamlama use-case'leri) ve sahte (in-memory) repository ile birim testleri.
 - [ ] Infrastructure katmanı (JPA entity eşlemeleri, PostgreSQL bağlantısı, Spring Security + JWT)
 - [ ] Presentation katmanı (REST controller'lar)
 - [ ] Frontend: giriş/kayıt ekranları, randevu oluşturma akışı
