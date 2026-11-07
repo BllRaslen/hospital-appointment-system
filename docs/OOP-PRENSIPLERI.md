@@ -105,6 +105,16 @@ metotlar (constructor) içinde geçersiz nesne oluşumunu engelleyen doğrulamal
 (invariant kontrolü) bulunur — örn. `Person` constructor'ı geçersiz TC Kimlik
 No ile nesne oluşturulmasına izin vermez.
 
+## 7. Tasarım Desenleri (Application Katmanı)
+
+Domain katmanındaki OOP ilkelerinin yanı sıra, `application/` katmanında üç
+klasik tasarım deseni kullanılmıştır — hepsi `backend/src/main/java/com/hastanesistemi/randevu/application/` altındadır:
+
+| Desen | Sınıf(lar) | Neden |
+|---|---|---|
+| **Repository** | `port.out.{Patient,Doctor,MedicalService,HealthcareFacility,Appointment}Repository` | Application katmanı, verinin PostgreSQL'de mi yoksa bellekte mi saklandığını bilmez; sadece bu arayüzleri bilir. Bağımlılık Kuralı'nın (Dependency Rule) somut uygulaması — bkz. `RandevuServisiTest` + `SahteRandevuDeposu`, gerçek bir veritabanı olmadan test edilebildiğini kanıtlar. |
+| **Factory Method** | `factory.EmployeeFactory` | `Role` enumuna göre `Doctor`/`Staff`/`FacilityManager`'dan hangisinin örnekleneceği kararı, çağıran koddan (ileride bir personel kayıt servisi/controller) ayrıştırılır. |
+
 ## Devam Edecek Çalışma
 
 Bu doküman, domain katmanı tamamlandıkça (application/infrastructure/
