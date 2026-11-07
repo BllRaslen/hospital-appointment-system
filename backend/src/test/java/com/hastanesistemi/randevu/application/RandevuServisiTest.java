@@ -1,6 +1,7 @@
 package com.hastanesistemi.randevu.application;
 
 import com.hastanesistemi.randevu.application.service.RandevuServisi;
+import com.hastanesistemi.randevu.domain.exception.AppointmentConflictException;
 import com.hastanesistemi.randevu.domain.exception.InvalidAvailabilityException;
 import com.hastanesistemi.randevu.domain.model.appointment.Appointment;
 import com.hastanesistemi.randevu.domain.model.appointment.AppointmentStatus;
@@ -80,5 +81,21 @@ class RandevuServisiTest {
 
         assertThrows(InvalidAvailabilityException.class,
                 () -> servis.randevuOlustur(hasta, doktor, hizmetOlustur(), tesisOlustur(), zaman));
+    }
+
+    @Test
+    void randevuOlusturma_cakisanIkinciRandevuReddedilir() {
+        TimeSlot zaman1 = new TimeSlot(LocalDateTime.of(2026, 11, 9, 10, 0), LocalDateTime.of(2026, 11, 9, 10, 30));
+        TimeSlot zaman2 = new TimeSlot(LocalDateTime.of(2026, 11, 9, 10, 15), LocalDateTime.of(2026, 11, 9, 10, 45));
+        Doctor doktor = doktorOlustur(zaman1.getBaslangic().getDayOfWeek());
+        Patient hasta1 = hastaOlustur(null);
+        Patient hasta2 = new Patient(2L, "Zeynep", "Aydin", "22233344455", "zeynep@example.com",
+                null, LocalDate.of(1995, 7, 7), null, null);
+
+        RandevuServisi servis = new RandevuServisi(new SahteRandevuDeposu());
+        servis.randevuOlustur(hasta1, doktor, hizmetOlustur(), tesisOlustur(), zaman1);
+
+        assertThrows(AppointmentConflictException.class,
+                () -> servis.randevuOlustur(hasta2, doktor, hizmetOlustur(), tesisOlustur(), zaman2));
     }
 }
