@@ -5,6 +5,7 @@ import com.hastanesistemi.randevu.domain.model.appointment.Appointment;
 import com.hastanesistemi.randevu.domain.model.person.Doctor;
 import com.hastanesistemi.randevu.domain.model.person.Patient;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -43,7 +44,13 @@ class SahteRandevuDeposu implements AppointmentRepository {
 
     @Override
     public List<Appointment> doktorunRandevulariniGetir(Doctor doktor) {
-        throw new UnsupportedOperationException("Henuz uygulanmadi.");
+        List<Appointment> sonuc = new ArrayList<>();
+        for (Appointment randevu : depo.values()) {
+            if (randevu.getDoktor().equals(doktor)) {
+                sonuc.add(randevu);
+            }
+        }
+        return sonuc;
     }
 
     @Override
