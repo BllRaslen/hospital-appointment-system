@@ -74,6 +74,20 @@ public class Doctor extends Employee implements Notifiable {
         this.tamamlananRandevuSayisi++;
     }
 
+    /**
+     * Veritabanindan okunan, zaten gecmiste birikmis tamamlanan randevu
+     * sayisini DOGRUDAN atar. Gunluk is akisinda (bir randevu tamamlandiginda)
+     * SADECE {@link #tamamlananRandevuSayaciniArttir()} kullanilmalidir; bu
+     * metot yalnizca infrastructure/persistence katmaninin, veritabanindan
+     * okunan bir doktoru dogru sayacla yeniden kurmasi (rehydration) icindir.
+     */
+    public void tamamlananRandevuSayisiniAyarla(int tamamlananRandevuSayisi) {
+        if (tamamlananRandevuSayisi < 0) {
+            throw new IllegalArgumentException("Tamamlanan randevu sayisi negatif olamaz.");
+        }
+        this.tamamlananRandevuSayisi = tamamlananRandevuSayisi;
+    }
+
     public void hizmetEkle(MedicalService hizmet) {
         if (hizmet != null && !sunduguHizmetler.contains(hizmet)) {
             sunduguHizmetler.add(hizmet);
