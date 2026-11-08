@@ -54,6 +54,48 @@ public class Appointment {
         this.olusturmaZamani = LocalDateTime.now();
     }
 
+    private Appointment(Long id, Patient hasta, Doctor doktor, MedicalService hizmet, HealthcareFacility tesis,
+                         TimeSlot zamanAraligi, AppointmentStatus durum, LocalDateTime olusturmaZamani,
+                         LocalDateTime onayZamani, String notlar) {
+        this.id = id;
+        this.hasta = hasta;
+        this.doktor = doktor;
+        this.hizmet = hizmet;
+        this.tesis = tesis;
+        this.zamanAraligi = zamanAraligi;
+        this.durum = durum;
+        this.olusturmaZamani = olusturmaZamani;
+        this.onayZamani = onayZamani;
+        this.notlar = notlar;
+    }
+
+    /**
+     * Veritabanindan (infrastructure/persistence katmani) okunan, DAHA
+     * ONCE gecerliligi kanitlanmis bir randevuyu, mevcut durumuyla BIREBIR
+     * yeniden kurar.
+     * <p>
+     * Neden ayri bir fabrika metodu gerekiyor: normal constructor, HER ZAMAN
+     * yeni ve BEKLEMEDE durumunda bir randevu olusturma is kuralini temsil
+     * eder (bkz. ana constructor). Ancak veritabanindan okunan bir kayit
+     * ONAYLANDI, TAMAMLANDI veya IPTAL_EDILDI durumunda olabilir — bu durum
+     * yeni bir is kurali ihlali DEGILDIR, zaten gecmiste onayla()/iptalEt()/
+     * tamamla() ile usulune uygun sekilde ulasilmis bir durumun sadece
+     * HAFIZAYA GERI YUKLENMESIDIR. Bu metot kasitli olarak domain disindan
+     * (sadece infrastructure/persistence mapper'lari tarafindan) cagrilmasi
+     * beklenir; durum gecis kurallarini DENETLEMEZ, cunku zaten denetlenmis
+     * bir veriyi tasir.
+     */
+    public static Appointment depodanYenidenOlustur(Long id, Patient hasta, Doctor doktor, MedicalService hizmet,
+                                                      HealthcareFacility tesis, TimeSlot zamanAraligi,
+                                                      AppointmentStatus durum, LocalDateTime olusturmaZamani,
+                                                      LocalDateTime onayZamani, String notlar) {
+        if (hasta == null || doktor == null || hizmet == null || tesis == null || zamanAraligi == null || durum == null) {
+            throw new IllegalArgumentException(
+                    "Depodan yeniden olusturmak icin hasta, doktor, hizmet, tesis, zaman araligi ve durum zorunludur.");
+        }
+        return new Appointment(id, hasta, doktor, hizmet, tesis, zamanAraligi, durum, olusturmaZamani, onayZamani, notlar);
+    }
+
     /**
      * Bu randevunun, ayni doktora ait baska bir randevu ile zaman olarak
      * cakisip cakismadigini kontrol eder. Iptal edilmis randevular cakisma
