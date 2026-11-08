@@ -15,7 +15,7 @@ public class StaffEntity extends EmployeeEntity {
     @Column(name = "unvan")
     private String unvan;
 
-    protected StaffEntity() {
+    public StaffEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

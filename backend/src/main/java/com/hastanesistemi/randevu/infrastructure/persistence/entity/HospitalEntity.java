@@ -18,7 +18,7 @@ public class HospitalEntity extends HealthcareFacilityEntity {
     @Column(name = "acil_servis_var_mi")
     private boolean acilServisVarMi;
 
-    protected HospitalEntity() {
+    public HospitalEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

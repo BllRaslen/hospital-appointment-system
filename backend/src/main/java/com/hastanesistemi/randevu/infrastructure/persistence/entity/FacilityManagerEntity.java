@@ -17,7 +17,7 @@ public class FacilityManagerEntity extends EmployeeEntity {
     @JoinColumn(name = "yonettigi_tesis_id")
     private HealthcareFacilityEntity yonettigiTesis;
 
-    protected FacilityManagerEntity() {
+    public FacilityManagerEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

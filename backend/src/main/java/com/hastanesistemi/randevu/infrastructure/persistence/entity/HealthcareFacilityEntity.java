@@ -66,7 +66,7 @@ public abstract class HealthcareFacilityEntity {
             inverseJoinColumns = @JoinColumn(name = "hizmet_id"))
     private List<MedicalServiceEntity> sunduguHizmetler = new ArrayList<>();
 
-    protected HealthcareFacilityEntity() {
+    public HealthcareFacilityEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

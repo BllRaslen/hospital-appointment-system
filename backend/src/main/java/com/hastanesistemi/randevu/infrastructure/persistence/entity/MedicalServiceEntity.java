@@ -34,7 +34,7 @@ public class MedicalServiceEntity {
     @Column(name = "ucret", nullable = false)
     private BigDecimal ucret;
 
-    protected MedicalServiceEntity() {
+    public MedicalServiceEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

@@ -15,7 +15,7 @@ public class ClinicEntity extends HealthcareFacilityEntity {
     @Column(name = "muayene_odasi_sayisi")
     private int muayeneOdasiSayisi;
 
-    protected ClinicEntity() {
+    public ClinicEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

@@ -44,7 +44,7 @@ public class DoctorEntity extends EmployeeEntity {
     @CollectionTable(name = "doktor_uygunluklari", joinColumns = @JoinColumn(name = "doktor_id"))
     private List<WorkingHoursEmbeddable> uygunlukZamanlari = new ArrayList<>();
 
-    protected DoctorEntity() {
+    public DoctorEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

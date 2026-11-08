@@ -66,7 +66,7 @@ public class AppointmentEntity {
     @Column(name = "notlar")
     private String notlar;
 
-    protected AppointmentEntity() {
+    public AppointmentEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

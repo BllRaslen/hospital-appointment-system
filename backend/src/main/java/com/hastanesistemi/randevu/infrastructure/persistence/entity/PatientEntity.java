@@ -28,7 +28,7 @@ public class PatientEntity extends PersonEntity {
     @Column(name = "alerji")
     private List<String> alerjiler = new ArrayList<>();
 
-    protected PatientEntity() {
+    public PatientEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

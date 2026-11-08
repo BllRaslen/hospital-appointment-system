@@ -37,7 +37,7 @@ public abstract class EmployeeEntity extends PersonEntity {
     @Column(name = "temel_maas", nullable = false)
     private BigDecimal temelMaas;
 
-    protected EmployeeEntity() {
+    public EmployeeEntity() {
         // JPA icin zorunlu bos constructor.
     }
 

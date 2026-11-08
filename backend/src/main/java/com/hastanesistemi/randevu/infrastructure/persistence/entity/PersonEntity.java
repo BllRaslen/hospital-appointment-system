@@ -43,7 +43,7 @@ public abstract class PersonEntity {
     @Column(name = "dogum_tarihi")
     private LocalDate dogumTarihi;
 
-    protected PersonEntity() {
+    public PersonEntity() {
         // JPA icin zorunlu bos constructor.
     }
 
