@@ -28,8 +28,8 @@ backend/src/main/java/com/hastanesistemi/randevu/
 ├── domain/           # Çekirdek iş kuralları — framework'ten bağımsız saf Java
 │   ├── model/        # Entity ve value object sınıfları (OOP'nin kalbi)
 │   └── exception/    # İş kuralı istisnaları
-├── application/      # Use-case'ler, port arayüzleri (henüz boş — yakında)
-├── infrastructure/   # JPA, PostgreSQL, Spring Security/JWT (henüz boş — yakında)
+├── application/      # Use-case'ler, port arayüzleri (Repository/Factory/Strategy desenleri)
+├── infrastructure/   # JPA entity/adapter'ları + PostgreSQL yapılandırması tamam; Spring Security/JWT henüz yok
 └── presentation/     # REST controller'ları (henüz boş — yakında)
 ```
 
@@ -70,7 +70,8 @@ ilerletilmektedir (bkz. proje teslim gereksinimleri — en az 10 farklı günde 
 
 - [x] **Gün 1 (2026-11-06):** Proje iskeleti (monorepo, backend/frontend klasör yapısı), backend domain katmanı (Person/Employee/Doctor/Staff/FacilityManager, HealthcareFacility/Hospital/Clinic, Appointment, MedicalService, value object'ler, istisnalar) ve birim testleri.
 - [x] **Gün 2 (2026-11-07):** Application katmanı — repository port arayüzleri (Repository deseni), `EmployeeFactory` (Factory Method deseni), `UcretlendirmeStrategy` ve implementasyonları (Strategy deseni), `RandevuServisi` (randevu oluşturma/onaylama/iptal/tamamlama use-case'leri) ve sahte (in-memory) repository ile birim testleri.
-- [ ] Infrastructure katmanı (JPA entity eşlemeleri, PostgreSQL bağlantısı, Spring Security + JWT)
+- [x] **Gün 3 (2026-11-08):** Infrastructure katmanı — JPA entity eşlemeleri (`PersonEntity`/`EmployeeEntity`/`HealthcareFacilityEntity` SINGLE_TABLE kalıtım stratejileri, embeddable'lar), Spring Data JPA repository arayüzleri, application port'larını gerçekleştiren adapter sınıfları (Adapter deseni), PostgreSQL datasource/JPA yapılandırması (`application.yml`) ve mapper birim testleri.
+- [ ] Spring Security + JWT yapılandırması
 - [ ] Presentation katmanı (REST controller'lar)
 - [ ] Frontend: giriş/kayıt ekranları, randevu oluşturma akışı
 - [ ] Frontend: doktor/yönetici panelleri
@@ -83,9 +84,13 @@ cd backend
 mvn spring-boot:run
 ```
 
-> Not: PostgreSQL bağlantı ayarları infrastructure katmanı eklendiğinde
-> `application.yml` içine girilecektir. Şu an için sadece domain katmanı
-> testleri çalıştırılabilir:
+> Not: `mvn spring-boot:run` için çalışan bir PostgreSQL veritabanı
+> gereklidir (bkz. `application.yml` — `DB_URL`/`DB_USERNAME`/`DB_PASSWORD`
+> ortam değişkenleriyle yapılandırılır, henüz presentation/REST katmanı
+> olmadığından ayağa kalkan uygulamayla şu an sadece Spring context'in
+> sağlıklı başladığı doğrulanabilir). Veritabanı olmadan, domain +
+> application + infrastructure/mapper birim testleri (Spring context
+> başlatılmadan, saf Java ile) çalıştırılabilir:
 > ```bash
 > cd backend
 > mvn test
