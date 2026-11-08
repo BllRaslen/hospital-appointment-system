@@ -123,7 +123,38 @@ bir araya getiren use-case servisidir: `randevuOlustur` → doktor uygunluğu
 `randevuOnayla`/`randevuIptalEt`/`randevuTamamla` → domain'in kendi durum
 makinesi; `efektifUcretHesapla` → enjekte edilen `UcretlendirmeStrategy`.
 
+## 8. JPA Eşlemeleri ve Adapter Deseni (Infrastructure Katmanı)
+
+`infrastructure/persistence/` altında, domain modelini PostgreSQL'e
+eşleyen bir JPA katmanı eklendi. Bu katmanın en önemli OOP/mimari dersi:
+**domain sınıflarının hiçbirine tek bir JPA anotasyonu bile eklenmedi** —
+Clean Architecture'ın Bağımlılık Kuralı korunuyor. Bunun yerine, `entity/`
+altında domain sınıflarıyla birebir eşleşen PARALEL bir sınıf hiyerarşisi
+tanımlandı:
+
+| Desen/Teknik | Nerede | Neden |
+|---|---|---|
+| **MappedSuperclass + SINGLE_TABLE kalıtım** | `PersonEntity` (mapped superclass) → `PatientEntity`; `EmployeeEntity` (`@Inheritance(SINGLE_TABLE)`) → `DoctorEntity`/`StaffEntity`/`FacilityManagerEntity`; aynı desen `HealthcareFacilityEntity` → `HospitalEntity`/`ClinicEntity` için tekrarlanır | Domain'deki kalıtım hiyerarşisi (bkz. bölüm 2), veritabanı şemasında discriminator kolonuyla (`calisan_turu`, `tesis_turu`) birebir yansıtılır — tek tabloda tüm alt türler, polimorfik sorgulanabilir şekilde saklanır. |
+| **Adapter** | `adapter.{Patient,Doctor,MedicalService,HealthcareFacility,Appointment}RepositoryAdapter` | Her biri, application katmanındaki bir port arayüzünü (bkz. bölüm 7 — Repository deseni) Spring Data JPA'nın somut API'siyle GERÇEKLEŞTİRİR. `RandevuServisi` bu adapter sınıflarının adını hiç bilmez; Spring bunları runtime'da enjekte eder. Bu, Dependency Inversion'ın üretim kodunda (gerçek veritabanıyla) çalıştığının kanıtıdır — bir önceki günün testlerinde bu rolü `SahteRandevuDeposu` oynuyordu. |
+| **Mapper (durumsuz dönüştürücü)** | `mapper.*Mapper` | `toEntity`/`toDomain` statik metotları, iki dünya (domain/JPA) arasındaki TEK geçiş noktasıdır. `HealthcareFacilityMapper`, tesisin gerçek türüne (`instanceof Hospital`/`Clinic`) göre doğru somut sınıfı seçerek mapper seviyesinde de çok biçimliliği sergiler. |
+
+Bilinçli bir JPA tuzağına da burada deginmek gerekir: `Appointment` bir
+`Patient`/`Doctor`/`MedicalService`/`HealthcareFacility`'ye (cross-aggregate)
+referans verir. Mapper bu referanslar için YENİ bir entity İNŞA ETMEZ —
+aksi halde Hibernate zaten var olan bir kaydı tekrar eklemeye çalışır
+("transient instance" hatası). Bunun yerine **adapter**, ilgili diğer
+repository'den `getReferenceById(id)` ile (ekstra sorgu olmadan) var olan
+kaydın referansını alır ve mapper'a hazır olarak verir — cross-aggregate
+referans çözümlemesi bilinçli olarak adapter'in sorumluluğundadır, mapper'ın
+değil.
+
+`AppointmentMapperTest`/`DoctorMapperTest`/`HealthcareFacilityMapperTest`/
+`PatientMapperTest`, mapper'ların PostgreSQL veya Spring bağlamı
+(ApplicationContext) olmadan, saf Java nesneleriyle test edilebildiğini
+kanıtlar — mapper'lar durumsuz oldukları için testleri de Gün 1/2'deki
+domain/application testleri kadar hızlıdır.
+
 ## Devam Edecek Çalışma
 
-Bu doküman, infrastructure (JPA/PostgreSQL) ve presentation (REST
-controller) katmanları eklendiğinde güncellenecektir.
+Bu doküman, Spring Security/JWT yapılandırması ve presentation (REST
+controller) katmanı eklendiğinde güncellenecektir.
