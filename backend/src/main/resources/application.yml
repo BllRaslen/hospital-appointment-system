@@ -27,3 +27,11 @@ spring:
 
 server:
   port: 8080
+
+# JWT (JSON Web Token) ile kimlik dogrulama ayarlari (infrastructure/security).
+# "secret" PRODUCTION'da asla varsayilan degeriyle KULLANILMAMALI, JWT_SECRET
+# ortam degiskeniyle GUCLU ve gizli bir deger ile ezilmelidir (HMAC-SHA256
+# icin en az 32 byte/256 bit uzunlukta olmasi gerekir).
+jwt:
+  secret: ${JWT_SECRET:bu-sadece-gelistirme-ortami-icin-varsayilan-cok-gizli-bir-anahtar-en-az-32-byte}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}

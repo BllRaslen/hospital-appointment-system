@@ -23,7 +23,11 @@
  *       {@code @Repository} ile isaretli Spring bean'leri (Adapter deseni).</li>
  * </ul>
  * <p>
- * Durum: Spring Security/JWT yapilandirmasi ve REST controller'lar (presentation)
- * ilerleyen gunlerde eklenecektir.
+ * {@code security/} alt paketinde Spring Security + JWT yapilandirmasi
+ * (UserDetails adapter, UserDetailsService, JWT uretimi/dogrulanmasi,
+ * istek filtresi, SecurityFilterChain) bulunur — bkz. {@code
+ * com.hastanesistemi.randevu.infrastructure.security} paket dokumantasyonu.
+ * <p>
+ * Durum: REST controller'lar (presentation) ilerleyen gunlerde eklenecektir.
  */
 package com.hastanesistemi.randevu.infrastructure;
