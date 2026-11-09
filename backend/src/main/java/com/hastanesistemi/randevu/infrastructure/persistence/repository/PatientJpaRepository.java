@@ -18,4 +18,10 @@ import java.util.Optional;
 public interface PatientJpaRepository extends JpaRepository<PatientEntity, Long> {
 
     Optional<PatientEntity> findByTcKimlikNo(String tcKimlikNo);
+
+    /**
+     * Kimlik dogrulama (login) akisinda e-posta ile hasta aramak icin
+     * kullanilir — bkz. {@code infrastructure.security.KullaniciDetayServisi}.
+     */
+    Optional<PatientEntity> findByEmail(String email);
 }
