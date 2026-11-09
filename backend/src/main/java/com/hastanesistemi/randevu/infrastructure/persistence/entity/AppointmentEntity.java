@@ -2,8 +2,6 @@ package com.hastanesistemi.randevu.infrastructure.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,7 +51,9 @@ public class AppointmentEntity {
     @Column(name = "bitis_zamani", nullable = false)
     private LocalDateTime bitisZamani;
 
-    @Enumerated(EnumType.STRING)
+    // Bilerek String: AppointmentStatus<->String donusumu AppointmentMapper'da
+    // yapilir (bkz. AppointmentMapper). "@Enumerated" BURAYA EKLENMEMELI -
+    // Hibernate bu anotasyonu sadece gercek enum alanlarinda kabul eder.
     @Column(name = "durum", nullable = false)
     private String durum;
 

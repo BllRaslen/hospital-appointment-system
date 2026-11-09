@@ -6,8 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -23,7 +21,9 @@ import java.util.List;
 @DiscriminatorValue("DOKTOR")
 public class DoctorEntity extends EmployeeEntity {
 
-    @Enumerated(EnumType.STRING)
+    // Bilerek String: Specialty<->String donusumu DoctorMapper'da yapilir
+    // (bkz. DoctorMapper). "@Enumerated" BURAYA EKLENMEMELI - Hibernate bu
+    // anotasyonu sadece gercek enum alanlarinda kabul eder.
     @Column(name = "uzmanlik_alani")
     private String uzmanlikAlani;
 
