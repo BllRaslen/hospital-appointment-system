@@ -17,6 +17,13 @@ import java.time.LocalDate;
  * kendi tablosu yoktur, alanlari alt sinif tablolarina (hastalar, calisanlar)
  * eklenir. Boylece domain modelindeki "ortak kisi bilgisi" kavrami, veritabani
  * seviyesinde de tekrar edilmeden paylasilir.
+ * <p>
+ * {@code sifreHash} BILINCLI OLARAK sadece burada (entity'de) bulunur; domain
+ * sinifi {@code Person}'da KARSILIGI YOKTUR. Kimlik dogrulama (authentication)
+ * bir is kurali degil, bir ALTYAPI/GUVENLIK detayidir — Clean Architecture'in
+ * Bagimlilik Kuraline gore domain bundan habersiz olmalidir. Sifre asla duz
+ * metin olarak degil, {@code BCryptPasswordEncoder} ile uretilmis hash olarak
+ * saklanir (bkz. {@code infrastructure.security.GuvenlikYapilandirmasi}).
  */
 @MappedSuperclass
 public abstract class PersonEntity {
@@ -42,6 +49,9 @@ public abstract class PersonEntity {
 
     @Column(name = "dogum_tarihi")
     private LocalDate dogumTarihi;
+
+    @Column(name = "sifre_hash")
+    private String sifreHash;
 
     public PersonEntity() {
         // JPA icin zorunlu bos constructor.
@@ -101,5 +111,13 @@ public abstract class PersonEntity {
 
     public void setDogumTarihi(LocalDate dogumTarihi) {
         this.dogumTarihi = dogumTarihi;
+    }
+
+    public String getSifreHash() {
+        return sifreHash;
+    }
+
+    public void setSifreHash(String sifreHash) {
+        this.sifreHash = sifreHash;
     }
 }
