@@ -29,7 +29,7 @@ backend/src/main/java/com/hastanesistemi/randevu/
 │   ├── model/        # Entity ve value object sınıfları (OOP'nin kalbi)
 │   └── exception/    # İş kuralı istisnaları
 ├── application/      # Use-case'ler, port arayüzleri (Repository/Factory/Strategy desenleri)
-├── infrastructure/   # JPA entity/adapter'ları + PostgreSQL yapılandırması tamam; Spring Security/JWT henüz yok
+├── infrastructure/   # JPA entity/adapter'ları + PostgreSQL yapılandırması + Spring Security/JWT tamam
 └── presentation/     # REST controller'ları (henüz boş — yakında)
 ```
 
@@ -71,8 +71,8 @@ ilerletilmektedir (bkz. proje teslim gereksinimleri — en az 10 farklı günde 
 - [x] **Gün 1 (2026-11-06):** Proje iskeleti (monorepo, backend/frontend klasör yapısı), backend domain katmanı (Person/Employee/Doctor/Staff/FacilityManager, HealthcareFacility/Hospital/Clinic, Appointment, MedicalService, value object'ler, istisnalar) ve birim testleri.
 - [x] **Gün 2 (2026-11-07):** Application katmanı — repository port arayüzleri (Repository deseni), `EmployeeFactory` (Factory Method deseni), `UcretlendirmeStrategy` ve implementasyonları (Strategy deseni), `RandevuServisi` (randevu oluşturma/onaylama/iptal/tamamlama use-case'leri) ve sahte (in-memory) repository ile birim testleri.
 - [x] **Gün 3 (2026-11-08):** Infrastructure katmanı — JPA entity eşlemeleri (`PersonEntity`/`EmployeeEntity`/`HealthcareFacilityEntity` SINGLE_TABLE kalıtım stratejileri, embeddable'lar), Spring Data JPA repository arayüzleri, application port'larını gerçekleştiren adapter sınıfları (Adapter deseni), PostgreSQL datasource/JPA yapılandırması (`application.yml`) ve mapper birim testleri.
-- [ ] Spring Security + JWT yapılandırması
-- [ ] Presentation katmanı (REST controller'lar)
+- [x] **Gün 4 (2026-11-09):** Spring Security + JWT yapılandırması — `PersonEntity`'ye kimlik doğrulama için `sifreHash` alanı, `RandevuKullanicisi` (`UserDetails` adapter'ı, Doctor/Staff/FacilityManager için çok biçimli rol çözümlemesi), `KullaniciDetayServisi` (`UserDetailsService`), `JwtServisi` (JWT üretimi/doğrulanması), `JwtKimlikDogrulamaFiltresi` (`OncePerRequestFilter`), `GuvenlikYapilandirmasi` (oturumsuz/stateless `SecurityFilterChain`, BCrypt `PasswordEncoder`) ve bu katmanın birim testleri.
+- [ ] Presentation katmanı (REST controller'lar — giriş/kayıt endpoint'leri dahil)
 - [ ] Frontend: giriş/kayıt ekranları, randevu oluşturma akışı
 - [ ] Frontend: doktor/yönetici panelleri
 - [ ] Entegrasyon testleri ve son rötuşlar
