@@ -154,7 +154,35 @@ değil.
 kanıtlar — mapper'lar durumsuz oldukları için testleri de Gün 1/2'deki
 domain/application testleri kadar hızlıdır.
 
+## 9. Spring Security + JWT (Infrastructure Katmanı)
+
+`infrastructure/security/` altında, kimlik doğrulamanın (authentication)
+**oturumsuz (stateless)** ve JWT tabanlı olarak nasıl kurulduğu açıklanır.
+Buradaki en önemli mimari karar: `sifreHash` alanı **domain sınıfı
+`Person`'a hiç eklenmedi**, sadece `PersonEntity`'ye eklendi — kimlik
+doğrulama bir iş kuralı değil, bir altyapı/güvenlik detayıdır; Bağımlılık
+Kuralı domain'in bundan habersiz kalmasını gerektirir.
+
+| Desen/Teknik | Nerede | Neden |
+|---|---|---|
+| **Adapter** | `RandevuKullanicisi` | `PersonEntity` hiyerarşisini (`PatientEntity`/`DoctorEntity`/`StaffEntity`/`FacilityManagerEntity`) Spring Security'nin `UserDetails` sözleşmesine bağlar. Spring Security hiçbir zaman proje entity'lerini doğrudan görmez. |
+| **Çok biçimlilik (`instanceof` çözümlemesi)** | `RandevuKullanicisi.calisandanOlustur(EmployeeEntity)` | `calisanlar` tablosu SINGLE_TABLE kalıtımla polimorfik sorgulandığı için (bkz. bölüm 8), kendisine verilen entity'nin GERÇEK alt türüne göre doğru `Role`'ü (DOKTOR/SAGLIK_PERSONELI/YONETICI) seçer. |
+| **Kapsülleme** | `JwtServisi` | jjwt kütüphanesinin ayrıştırma (parsing) detayları ve gizli anahtar tamamen `private`'tır; dışa sadece `tokenUret`/`kullaniciAdiniCikar`/`tokenGecerliMi` gibi anlamlı işlemler açılır. |
+| **Şablon Metot (Template Method)** | `JwtKimlikDogrulamaFiltresi extends OncePerRequestFilter` | Spring Security'nin sağladığı "filtre zincirinde bir kez çalış" iskeletine, sadece değişken parça (`doFilterInternal`) eklenir — `Employee.toplamAylikOdemeHesapla()` ile aynı ilke. |
+| **Kompozisyon** | `GuvenlikYapilandirmasi` | Kendi başına kimlik doğrulama mantığı içermez; `KullaniciDetayServisi`, `PasswordEncoder` (BCrypt) ve `JwtKimlikDogrulamaFiltresi`'ni enjekte edilen parçalar olarak bir araya getirir (bkz. bölüm 7 — Strategy ile aynı "kalıtım yerine kompozisyon" mantığı). |
+
+Sistemde "tek bir kullanıcılar tablosu" yoktur (hasta ve çalışanlar ayrı
+tablolarda tutulur, bkz. bölüm 8); `KullaniciDetayServisi`
+(`UserDetailsService`), e-posta ile önce hastalarda, bulamazsa
+`EmployeeJpaRepository` ile (Doktor/SağlıkPersoneli/Yönetici'yi TEK sorguyla
+polimorfik olarak döndüren) çalışanlarda arama yaparak bu ayrımı kimlik
+doğrulama katmanından gizler.
+
+`JwtServisiTest`/`RandevuKullanicisiTest`, bu katmanın da (mapper'lar gibi)
+Spring `ApplicationContext` veya PostgreSQL olmadan, saf Java nesneleriyle
+test edilebildiğini kanıtlar.
+
 ## Devam Edecek Çalışma
 
-Bu doküman, Spring Security/JWT yapılandırması ve presentation (REST
-controller) katmanı eklendiğinde güncellenecektir.
+Bu doküman, presentation (REST controller) katmanı — giriş/kayıt
+endpoint'leri dahil — eklendiğinde güncellenecektir.
