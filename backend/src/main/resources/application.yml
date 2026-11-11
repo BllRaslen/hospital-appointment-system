@@ -6,9 +6,9 @@ spring:
   # gelistirme icindir); sifre gibi gizli bilgiler asla dogrudan buraya
   # yazilmaz.
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/randevu_db}
-    username: ${DB_USERNAME:randevu_user}
-    password: ${DB_PASSWORD:randevu_pass}
+    url: jdbc:postgresql://51.38.113.222:5432/randevu_db
+    username: bllraslen
+    password: bllraslen
 
   jpa:
     # "update": gelistirme asamasinda, henuz ayri bir migration araci
