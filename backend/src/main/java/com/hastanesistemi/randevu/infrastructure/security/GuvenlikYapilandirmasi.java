@@ -31,9 +31,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * kimligini {@code Authorization} basligindaki JWT ile kanitlar; bu yuzden
  * CSRF korumasi (cerez tabanli oturumlar icin anlamlidir) devre disi
  * birakilir ve session olusturma politikasi {@code STATELESS} olarak
- * ayarlanir. {@code /api/auth/**} (giris/kayit) ilerleyen gunde eklenecek
- * presentation katmaninda tanimlanacaktir ve herkese ACIKTIR; diger TUM
- * endpoint'ler gecerli bir JWT gerektirir.
+ * ayarlanir. {@code /api/auth/**} (giris/kayit - bkz. {@code AuthController})
+ * herkese ACIKTIR; diger TUM endpoint'ler gecerli bir JWT gerektirir. CORS
+ * (bkz. {@code CorsYapilandirmasi}), Next.js frontend'in farkli bir
+ * origin'den (localhost:3000) istek atabilmesi icin acilir.
  */
 @Configuration
 @EnableMethodSecurity
@@ -70,6 +71,7 @@ public class GuvenlikYapilandirmasi {
     public SecurityFilterChain guvenlikFiltreZinciri(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> { })
                 .sessionManagement(oturum -> oturum.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(istekler -> istekler
                         .requestMatchers("/api/auth/**").permitAll()
