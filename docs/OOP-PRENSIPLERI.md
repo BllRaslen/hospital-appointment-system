@@ -182,7 +182,36 @@ doğrulama katmanından gizler.
 Spring `ApplicationContext` veya PostgreSQL olmadan, saf Java nesneleriyle
 test edilebildiğini kanıtlar.
 
+## 10. Presentation Katmanı (REST Controller'lar)
+
+`presentation/` altında, application/domain katmanlarını HTTP'ye açan "ince"
+controller'lar eklendi. Buradaki en önemli mimari karar: controller'lar
+**hiçbir iş kuralı içermez** — `RandevuServisi`/`Appointment`/`Doctor`'daki
+kuralların (çakışma, durum geçişi, uygunluk) sadece HTTP'ye çevirisini yapar.
+
+| Desen/Teknik | Nerede | Neden |
+|---|---|---|
+| **Çok biçimlilik (polimorfik yakalama)** | `GlobalHataYakalayici.cakismaVeDurumHatalari` | Tek bir `@ExceptionHandler`, `DomainException`'ın BİRDEN FAZLA alt sınıfını (`AppointmentConflictException`, `InvalidAppointmentStateException`) tek seferde yakalar — bkz. bölüm 3 (çok biçimlilik) ve `DomainException` ic dokümantasyonu. |
+| **DTO (veri taşıyıcı) + fromDomain** | `presentation.dto.*` (`HastaYanit`, `DoktorYanit`, `HizmetYanit`, `TesisYanit`, `RandevuYanit`) | Domain nesneleri HTTP/JSON'a DOĞRUDAN serileştirilmez — her DTO'nun statik `fromDomain` metodu, hangi alanların dışa açılacağını (örn. şifre hash'inin ASLA dışa açılmaması) tek bir yerde kontrol eder. |
+| **Factory Method (yeniden kullanım)** | `AuthController.doktorKayitOl` | Bölüm 7'deki `EmployeeFactory`, presentation katmanından da çağrılır — bir yöneticinin yeni doktor hesabı açması akışında HANGİ somut `Employee` alt sınıfının üretileceği kararı hâlâ factory'dedir, controller bunu bilmez. |
+| **Framework'ten bağımsız application katmanının Spring'e bağlanması** | `infrastructure.config.UygulamaServisleriYapilandirmasi` | `RandevuServisi`'nin KENDİSİ hiçbir Spring anotasyonu içermez (bölüm 7); bu `@Configuration` sınıfı, `@Bean` fabrika metoduyla onu Spring bağlamına (context) bağlar. "Framework'e bağlama" sorumluluğu, Bağımlılık Kuralı'na uygun şekilde EN DIŞ katmanda toplanır. |
+| **Yetki bazlı erişim kontrolü** | `@PreAuthorize` (`RandevuController`, `AuthController.doktorKayitOl`, `HastaController`) | `Role` enumuna (bölüm 1/3) karşılık gelen `ROLE_*` yetkileri (`RandevuKullanicisi.getAuthorities`, bölüm 9), metot seviyesinde (`@EnableMethodSecurity`) kontrol edilir — ör. sadece `ROLE_HASTA` randevu oluşturabilir, sadece `ROLE_DOKTOR`/`ROLE_SAGLIK_PERSONELI` onaylayabilir/tamamlayabilir. |
+
+`RandevuController.randevuIptalEt` ayrıca domain SEVIYESINDE olmayan, ama
+güvenlik için gerekli bir iş kuralı uygular: bir HASTA sadece KENDİ
+randevusunu iptal edebilir (randevunun `hasta.id`'si ile oturum açan
+kullanıcının `kullaniciId`'si karşılaştırılır); doktor/personel/yönetici
+herhangi bir randevuyu iptal edebilir. Bu kontrol bilinçli olarak
+controller'da yapılır, çünkü "kim kimin verisine erişebilir" bir yetkilendirme
+(authorization) detayıdır, randevunun kendi iç tutarlılığıyla (bölüm 1'deki
+`Appointment` kapsüllemesi) ilgili değildir.
+
+`DtoDonusumTest`, mapper testleriyle (bölüm 8) aynı felsefeyle, her
+`...Yanit.fromDomain` dönüşümünün alanları doğru eşlediğini kanıtlar;
+`GlobalHataYakalayiciTest` ise her istisna türünün doğru HTTP durum koduna
+çevrildiğini, Spring `ApplicationContext` başlatmadan doğrular.
+
 ## Devam Edecek Çalışma
 
-Bu doküman, presentation (REST controller) katmanı — giriş/kayıt
-endpoint'leri dahil — eklendiğinde güncellenecektir.
+Bu doküman, frontend (Next.js) giriş/kayıt ekranları ve randevu oluşturma
+akışı tamamlandığında tekrar güncellenecektir.
