@@ -35,11 +35,11 @@ backend/src/main/java/com/hastanesistemi/randevu/
 
 ```
 frontend/src/
-├── app/              # Next.js App Router sayfaları (presentation)
+├── app/              # Next.js App Router sayfaları (/, /giris, /kayit, /randevu-olustur, /randevularim)
 ├── domain/           # API sözleşmesini temsil eden TypeScript tipleri
-├── application/      # (yakında) use-case hook'ları
-├── infrastructure/   # API istemcisi (apiClient.ts)
-└── presentation/      # (yakında) React bileşenleri
+├── application/      # use-case hook'ları (auth/AuthContext+useAuth, randevu/useRandevuOlusturFormu)
+├── infrastructure/   # API istemcileri (apiClient, authApi, randevuApi)
+└── presentation/      # React bileşenleri (GirisFormu, KayitFormu, RandevuOlusturFormu, Navbar)
 ```
 
 ## Çok Şubeli Yapı İçin Veri Modeli
@@ -72,8 +72,7 @@ ilerletilmektedir (bkz. proje teslim gereksinimleri — en az 10 farklı günde 
 - [x] **Gün 2 (2026-11-07):** Application katmanı — repository port arayüzleri (Repository deseni), `EmployeeFactory` (Factory Method deseni), `UcretlendirmeStrategy` ve implementasyonları (Strategy deseni), `RandevuServisi` (randevu oluşturma/onaylama/iptal/tamamlama use-case'leri) ve sahte (in-memory) repository ile birim testleri.
 - [x] **Gün 3 (2026-11-08):** Infrastructure katmanı — JPA entity eşlemeleri (`PersonEntity`/`EmployeeEntity`/`HealthcareFacilityEntity` SINGLE_TABLE kalıtım stratejileri, embeddable'lar), Spring Data JPA repository arayüzleri, application port'larını gerçekleştiren adapter sınıfları (Adapter deseni), PostgreSQL datasource/JPA yapılandırması (`application.yml`) ve mapper birim testleri.
 - [x] **Gün 4 (2026-11-09):** Spring Security + JWT yapılandırması — `PersonEntity`'ye kimlik doğrulama için `sifreHash` alanı, `RandevuKullanicisi` (`UserDetails` adapter'ı, Doctor/Staff/FacilityManager için çok biçimli rol çözümlemesi), `KullaniciDetayServisi` (`UserDetailsService`), `JwtServisi` (JWT üretimi/doğrulanması), `JwtKimlikDogrulamaFiltresi` (`OncePerRequestFilter`), `GuvenlikYapilandirmasi` (oturumsuz/stateless `SecurityFilterChain`, BCrypt `PasswordEncoder`) ve bu katmanın birim testleri.
-- [x] **Gün 5 (2026-11-11):** Presentation katmanı — `AuthController` (giriş/kayıt/kayıt-doktor), `RandevuController` (oluştur/onayla/iptal/tamamla/listele), `DoktorController`/`HizmetController`/`TesisController`/`HastaController` (listeleme), istek/yanıt DTO'ları, `GlobalHataYakalayici` (`DomainException` → HTTP durum kodu eşlemesi), `KayitServisi` (şifre hash'leme), `UygulamaServisleriYapilandirmasi` (`RandevuServisi` bean wiring), `CorsYapilandirmasi` (Next.js için CORS) ve bu katmanın birim testleri.
-- [ ] Frontend: giriş/kayıt ekranları, randevu oluşturma akışı
+- [x] **Gün 5 (2026-11-11):** Backend presentation katmanı — `AuthController` (giriş/kayıt/kayıt-doktor), `RandevuController` (oluştur/onayla/iptal/tamamla/listele), `DoktorController`/`HizmetController`/`TesisController`/`HastaController` (listeleme), istek/yanıt DTO'ları, `GlobalHataYakalayici` (`DomainException` → HTTP durum kodu eşlemesi), `KayitServisi` (şifre hash'leme), `UygulamaServisleriYapilandirmasi` (`RandevuServisi` bean wiring), `CorsYapilandirmasi` (Next.js için CORS) ve bu katmanın birim testleri. Aynı gün içinde frontend tarafı da tamamlandı: `apiClient`'a JWT token desteği, `authApi`/`randevuApi` istemcileri, `AuthContext`/`useAuth` (oturum durumu), giriş/kayıt formları (`GirisFormu`/`KayitFormu`) ve sayfaları (`/giris`, `/kayit`), randevu oluşturma akışı (`useRandevuOlusturFormu`, `RandevuOlusturFormu`, `/randevu-olustur`), randevu listeleme/iptal sayfası (`/randevularim`), oturum-duyarlı `Navbar` ve ana sayfa.
 - [ ] Frontend: doktor/yönetici panelleri
 - [ ] Entegrasyon testleri ve son rötuşlar
 
@@ -105,4 +104,9 @@ npm install
 npm run dev
 ```
 
-Tarayıcıda `http://localhost:3000` adresini açın.
+Tarayıcıda `http://localhost:3000` adresini açın. Backend'in
+`http://localhost:8080`'de çalıştığı varsayılır (`NEXT_PUBLIC_API_BASE_URL`
+ile değiştirilebilir, bkz. `.env.local.example`). Hasta kaydı için `/kayit`,
+giriş için `/giris`, randevu oluşturmak için `/randevu-olustur`, mevcut
+randevuları görüntülemek/iptal etmek için `/randevularim` sayfaları
+kullanılabilir.
