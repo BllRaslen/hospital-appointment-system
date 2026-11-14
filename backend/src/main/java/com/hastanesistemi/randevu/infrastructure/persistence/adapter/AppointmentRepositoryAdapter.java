@@ -16,6 +16,7 @@ import com.hastanesistemi.randevu.infrastructure.persistence.repository.Healthca
 import com.hastanesistemi.randevu.infrastructure.persistence.repository.MedicalServiceJpaRepository;
 import com.hastanesistemi.randevu.infrastructure.persistence.repository.PatientJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,11 @@ import java.util.Optional;
 /**
  * {@code AppointmentRepository} portunun JPA ile gerceklestirilmesi. Bkz.
  * {@link com.hastanesistemi.randevu.infrastructure.persistence.adapter.PatientRepositoryAdapter}
- * ic dokumantasyonu (Adapter deseni).
+ * ic dokumantasyonu (Adapter deseni + sinif seviyesindeki {@code
+ * @Transactional}'in nedeni - {@code AppointmentMapper.toDomain}, hasta/
+ * doktor/tesis icin {@code PatientMapper}/{@code DoctorMapper}/{@code
+ * HealthcareFacilityMapper}'i COGRAZTIRIR; bunlarin HER BIRI kendi LAZY
+ * koleksiyonlarina erisir).
  * <p>
  * Bu adapter, {@code RandevuServisi}'nin (application/service) kurucusuna
  * enjekte edilen {@code AppointmentRepository} PORTUNUN GERCEK (runtime)
@@ -33,6 +38,7 @@ import java.util.Optional;
  * (bagimliligin somut degil soyut tipe yapilmasi) en net kanitidir.
  */
 @Repository
+@Transactional
 public class AppointmentRepositoryAdapter implements AppointmentRepository {
 
     private final AppointmentJpaRepository appointmentJpaRepository;
@@ -58,7 +64,20 @@ public class AppointmentRepositoryAdapter implements AppointmentRepository {
         PatientEntity hastaReferansi = patientJpaRepository.getReferenceById(randevu.getHasta().getId());
         DoctorEntity doktorReferansi = doctorJpaRepository.getReferenceById(randevu.getDoktor().getId());
         MedicalServiceEntity hizmetReferansi = medicalServiceJpaRepository.getReferenceById(randevu.getHizmet().getId());
-        HealthcareFacilityEntity tesisReferansi = healthcareFacilityJpaRepository.getReferenceById(randevu.getTesis().getId());
+        // NOT: tesis icin DAHA sonra getReferenceById KULLANILAMAZ. Aksinin
+        // tersine Doctor/MedicalService/Patient icin, HealthcareFacilityJpaRepository
+        // SOYUT KOK tipe (HealthcareFacilityEntity) gore tanimlidir (Hospital/Clinic
+        // AYNI SINGLE_TABLE'i paylasir); bu yuzden getReferenceById, GERCEK
+        // alt turu (Hospital/Clinic) BILMEDEN bir proxy doner - HealthcareFacilityMapper'in
+        // asagida (toDomain cagrisinda) yaptigi "instanceof HospitalEntity/ClinicEntity"
+        // kontrolu, proxy SATIRA ERISILMEDEN (bu metot zaten burada herhangi
+        // bir alan OKUMADIGI icin) HICBIR ZAMAN dogru sonuc vermez. findById,
+        // alt turu belirlemek icin zaten bir SELECT yapmak ZORUNDA oldugundan
+        // (discriminator kolonu okunmadan dogru Java sinifi seciLEMEZ), burada
+        // "ekstra sorgu olmadan referans al" optimizasyonu tesis icin pratikte
+        // UYGULANAMAZ.
+        HealthcareFacilityEntity tesisReferansi = healthcareFacilityJpaRepository.findById(randevu.getTesis().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Tesis bulunamadi: id=" + randevu.getTesis().getId()));
 
         AppointmentEntity kaydedilen = appointmentJpaRepository.save(
                 AppointmentMapper.toEntity(randevu, hastaReferansi, doktorReferansi, hizmetReferansi, tesisReferansi));
